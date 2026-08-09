@@ -1,4 +1,4 @@
-name: openwrt-packages
+name: openwrt_package
 
 on:
   repository_dispatch:
