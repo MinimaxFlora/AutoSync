@@ -45,7 +45,7 @@ jobs:
 
     - name: Detect version-changed packages
       run: |
-        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        cd $GITHUB_WORKSPACE/openwrt_package
         : > /tmp/version_changed_packages.txt
         : > /tmp/package_version_map.txt
 
@@ -83,7 +83,7 @@ jobs:
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
-        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        cd $GITHUB_WORKSPACE/openwrt_package
 
         git add -A
         # 不修改 README.md，始终还原为 HEAD 版本
