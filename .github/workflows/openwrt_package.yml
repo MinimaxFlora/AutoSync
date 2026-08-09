@@ -1,0 +1,200 @@
+name: openwrt-packages
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  job_openwrt-packages:
+    if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
+    runs-on: ubuntu-latest
+
+    name: Update openwrt-packages
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [master]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7.0.1
+      with:
+        fetch-depth: 0
+
+    - name: Initialization environment
+      run: |
+        git config --global user.email "zj18139624826@gmail.com"
+        git config --global user.name "MinimaxFlora"
+
+    - name: Clone packages
+      run: |
+        cd $GITHUB_WORKSPACE
+        chmod +x .github/diy/openwrt_package.sh
+        git clone -b master https://github.com/MinimaxFlora/openwrt_package.git
+        cd openwrt_package
+        # 保留 .git、.github、diy 目录，只清除包目录
+        find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.github' ! -name 'diy' -exec rm -rf {} +
+
+        $GITHUB_WORKSPACE/.github/diy/openwrt_package.sh
+        bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
+        bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
+        bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
+
+    - name: Detect version-changed packages
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
+        : > /tmp/version_changed_packages.txt
+        : > /tmp/package_version_map.txt
+
+        get_ver() {
+          awk '/^(PKG_VERSION|LUCI_VERSION)[[:space:]]*:?=/{
+            sub(/^[^=]*=[[:space:]]*/,""); gsub(/[[:space:]]+$/,""); print; exit
+          }' "$1"
+        }
+
+        # 遍历所有 Makefile（新包 untracked 也能捕获）
+        for makefile in */Makefile; do
+          [ -f "$makefile" ] || continue
+          pkg=$(dirname "$makefile")
+          new_ver=$(get_ver "$makefile")
+          [ -z "$new_ver" ] && continue
+
+          old_ver=""
+          if git cat-file -e "HEAD:${makefile}" 2>/dev/null; then
+            old_ver=$(git show "HEAD:${makefile}" | awk '/^(PKG_VERSION|LUCI_VERSION)[[:space:]]*:?=/{
+              sub(/^[^=]*=[[:space:]]*/,""); gsub(/[[:space:]]+$/,""); print; exit
+            }')
+          fi
+
+          if [ "$new_ver" != "$old_ver" ]; then
+            echo "$pkg" >> /tmp/version_changed_packages.txt
+            echo "$pkg|$new_ver" >> /tmp/package_version_map.txt
+          fi
+        done
+
+        sort -u /tmp/version_changed_packages.txt -o /tmp/version_changed_packages.txt
+        echo "版本变更包: $(wc -l < /tmp/version_changed_packages.txt) 个"
+        cat /tmp/package_version_map.txt
+
+    - name: 🚀 Upload
+      env:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      run: |
+        cd $GITHUB_WORKSPACE/${{matrix.target}}
+
+        git add -A
+        # 不修改 README.md，始终还原为 HEAD 版本
+        git checkout HEAD -- README.md 2>/dev/null || true
+
+        if git diff --cached --quiet; then
+          echo "ℹ️ nothing to commit"
+          exit 0
+        fi
+
+        Emoji=("🌸" "🐌" "🌿" "⛅" "🍂" "💦" "💤" "💭" "🍭" "🎉" "🎁" "🎈" "🐾" "🎨" "💋" "🍓" "🍕" "🍉" "🙈" "🤡" "🍡")
+        emoji="${Emoji[$((RANDOM % ${#Emoji[@]}))]}"
+
+        get_pkg_version() {
+          [ -s /tmp/package_version_map.txt ] || { echo ""; return; }
+          awk -F'|' -v p="$1" '$1==p{print $2; exit}' /tmp/package_version_map.txt
+        }
+
+        # 处理上游 commit 信息：过滤杂乱内容，去掉重复包名前缀，截断超长
+        get_upstream_msg() {
+          local pkg="$1"
+          [ -s /tmp/upstream_commit_msgs.txt ] || { echo ""; return; }
+          local raw
+          raw=$(awk -F'|' -v p="$pkg" '$1==p{sub(/^[^|]*\|/,""); print; exit}' /tmp/upstream_commit_msgs.txt)
+          [ -z "$raw" ] && { echo ""; return; }
+
+          # 过滤杂乱信息
+          echo "$raw" | grep -qiE '^(Merge (pull request|branch)|Bump |bump actions|Signed-off-by:|chore: (bump|format)|Release v?[0-9]|dependabot)' \
+            && { echo ""; return; }
+
+          # 去掉 "pkgname: " 重复前缀
+          local msg
+          msg=$(echo "$raw" | sed "s/^${pkg}[[:space:]]*:[[:space:]]*//" | sed 's/^[[:space:]]*//')
+
+          # 截断超长
+          [ ${#msg} -gt 72 ] && msg="${msg:0:69}..."
+          echo "$msg"
+        }
+
+        all_changed=$(git diff --cached --name-only -- . ':(exclude).github/**' ':(exclude)diy/**' \
+          | awk -F/ 'NF>1{print $1}' | sort -u)
+
+        # 逐包单独提交
+        git reset HEAD -- . 2>/dev/null || git reset 2>/dev/null || true
+        committed_any=false
+
+        while IFS= read -r pkg; do
+          [ -z "$pkg" ] && continue
+
+          git add -A -- "$pkg/" 2>/dev/null || true
+          git diff --cached --quiet && continue
+
+          ver=$(get_pkg_version "$pkg")
+          if [ -n "$ver" ]; then
+            commit_msg="$pkg: update to $ver"
+          else
+            upstream_msg=$(get_upstream_msg "$pkg")
+            if [ -n "$upstream_msg" ]; then
+              commit_msg="$pkg: $upstream_msg"
+            else
+              commit_msg="$pkg: sync upstream"
+            fi
+          fi
+
+          git commit -m "$emoji $commit_msg"
+          echo "✅ $emoji $commit_msg"
+          committed_any=true
+        done <<< "$all_changed"
+
+        # 处理剩余变更（根目录文件等，排除 README.md）
+        git add -A
+        git checkout HEAD -- README.md 2>/dev/null || true
+        if ! git diff --cached --quiet; then
+          git commit -m "$emoji sync: refresh packages"
+          committed_any=true
+        fi
+
+        if [ "$committed_any" = "true" ]; then
+          git push --force --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/MinimaxFlora/openwrt_package.git" HEAD:master
+          echo "✅ Push 完成"
+        else
+          echo "ℹ️ nothing to push"
+        fi
+
+    - name: Delete workflow runs
+      env:
+        GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        REPO: MinimaxFlora/openwrt_package
+        WORKFLOW_NAME: ${{ github.workflow }}
+        RETAIN_DAYS: "1"
+        KEEP_MINIMUM_RUNS: "1"
+      run: |
+        set -euo pipefail
+        cutoff=$(date -u -d "${RETAIN_DAYS} days ago" +%s)
+        mapfile -t runs < <(gh run list --repo "$REPO" --workflow "$WORKFLOW_NAME" --limit 200 --json databaseId,createdAt --jq '.[] | [.databaseId, .createdAt] | @tsv')
+        total=${#runs[@]}
+        if [ "$total" -le "$KEEP_MINIMUM_RUNS" ]; then
+          echo "No workflow runs to delete ($total <= $KEEP_MINIMUM_RUNS)"
+          exit 0
+        fi
+        index=0
+        for run in "${runs[@]}"; do
+          index=$((index + 1))
+          if [ "$index" -le "$KEEP_MINIMUM_RUNS" ]; then
+            continue
+          fi
+          run_id=${run%%$'\t'*}
+          created_at=${run#*$'\t'}
+          created_epoch=$(date -u -d "$created_at" +%s)
+          if [ "$created_epoch" -gt "$cutoff" ]; then
+            continue
+          fi
+          gh api --method DELETE "repos/$REPO/actions/runs/$run_id" || true
+        done
