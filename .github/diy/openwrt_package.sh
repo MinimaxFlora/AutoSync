@@ -33,6 +33,8 @@ git clone --depth 1 -b main https://github.com/sbwml/luci-app-quickfile openwrt-
 git clone --depth 1 -b v5 https://github.com/sbwml/luci-app-mosdns openwrt-mosdns && mv -n openwrt-mosdns/{v2dat,mosdns,luci-app-mosdns} ./ ; rm -rf openwrt-mosdns
 git clone --depth 1 -b main https://github.com/sbwml/luci-app-airconnect openwrt-airconnect && mv -n openwrt-airconnect/{airconnect,luci-app-airconnect} ./ ; rm -rf openwrt-airconnect
 git clone --depth 1 -b main https://github.com/sbwml/luci-app-openlist2 openwrt-openlist2 && mv -n openwrt-openlist2/{openlist2,luci-app-openlist2} ./ ; rm -rf openwrt-openlist2
+git clone --depth 1 -b main https://github.com/timsaya/luci-app-bandix-plus openwrt-bandix && mv -n openwrt-bandix/luci-app-bandix-plus ./ ; rm -rf openwrt-bandix
+git clone --depth 1 https://github.com/timsaya/openwrt-bandix-plus openwrt-bandix && mv -n openwrt-bandix/openwrt-bandix-plus ./ ; rm -rf openwrt-bandix
 
 ### 科学插件 ###
 git clone --depth 1 -b master https://github.com/immortalwrt/homeproxy luci-app-homeproxy
@@ -44,6 +46,7 @@ git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall2 && mv 
 git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages && mv -n openwrt-passwall-packages/{chinadns-ng,dns2socks,geoview,hysteria,ipt2socks,microsocks,naiveproxy,shadow-tls,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,v2ray-geodata,v2ray-plugin,xray-core,xray-plugin} ./ ; rm -rf openwrt-passwall-packages
 
 ### 相关设置 ###
+mv openwrt-bandix bandix-plus
 cp -f $GITHUB_WORKSPACE/images/bg1.jpg luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 sed -i "s/option online_wallpaper 'bing'/option online_wallpaper 'none'/g" luci-app-argon-config/root/etc/config/argon
 sed -i 's#include ../../luci.mk#include $(TOPDIR)/feeds/luci/luci.mk#g' luci-theme-design/Makefile
