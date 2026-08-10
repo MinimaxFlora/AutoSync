@@ -43,7 +43,11 @@ git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall && mv -
 git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall2 && mv -n openwrt-passwall2/luci-app-passwall2 ./ ; rm -rf openwrt-passwall2
 git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages && mv -n openwrt-passwall-packages/{chinadns-ng,dns2socks,geoview,hysteria,ipt2socks,microsocks,naiveproxy,shadow-tls,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,v2ray-geodata,v2ray-plugin,xray-core,xray-plugin} ./ ; rm -rf openwrt-passwall-packages
 
-### 相关设置
+### 相关设置 ###
+cp -f $GITHUB_WORKSPACE/images/bg1.jpg luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+sed -i "s/option online_wallpaper 'bing'/option online_wallpaper 'none'/g" luci-app-argon-config/root/etc/config/argon
+sed -i 's#include ../../luci.mk#include $(TOPDIR)/feeds/luci/luci.mk#g' luci-theme-design/Makefile
+sed -i 's#include ../../lang/golang/golang-package.mk#include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk#g' sing-box/Makefile
 
 ### 提前保存各包的上游最新 commit 信息（在删除 .git 之前）###
 echo "保存上游 commit 信息..."
