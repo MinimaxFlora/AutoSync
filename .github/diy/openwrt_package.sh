@@ -46,7 +46,7 @@ git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall2 && mv 
 git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall-packages && mv -n openwrt-passwall-packages/{chinadns-ng,dns2socks,geoview,hysteria,ipt2socks,microsocks,naiveproxy,shadow-tls,shadowsocks-rust,shadowsocksr-libev,simple-obfs,tcping,v2ray-geodata,v2ray-plugin,xray-core,xray-plugin} ./ ; rm -rf openwrt-passwall-packages
 
 ### 相关设置 ###
-mv openwrt-bandix bandix-plus
+mv openwrt-bandix-plus bandix-plus
 cp -f $GITHUB_WORKSPACE/images/bg1.jpg luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 sed -i "s/option online_wallpaper 'bing'/option online_wallpaper 'none'/g" luci-app-argon-config/root/etc/config/argon
 sed -i 's#include ../../luci.mk#include $(TOPDIR)/feeds/luci/luci.mk#g' luci-theme-design/Makefile
