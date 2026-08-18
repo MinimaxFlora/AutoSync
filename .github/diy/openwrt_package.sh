@@ -23,6 +23,7 @@ git clone --depth 1 https://github.com/eamonxg/luci-app-aurora-config
 git clone --depth 1 https://github.com/eamonxg/luci-theme-shadcn
 git clone --depth 1 https://github.com/sirpdboy/luci-theme-kucat
 git clone --depth 1 https://github.com/sirpdboy/luci-app-kucat-config
+git clone --depth 1 https://github.com/LazuliKao/luci-theme-fluent
 git clone --depth 1 -b openwrt-25.12 https://github.com/coolsnowwolf/luci && mv -n luci/themes/luci-theme-design ./ ; rm -rf luci
 
 ### 通用插件 ###
