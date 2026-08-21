@@ -29,6 +29,7 @@ git clone --depth 1 -b openwrt-25.12 https://github.com/coolsnowwolf/luci && mv 
 ### 通用插件 ###
 git clone --depth 1 https://github.com/sbwml/luci-app-ramfree
 git clone --depth 1 -b openwrt-25.12 https://github.com/MinimaxFlora/autocore
+git clone --depth 1 https://github.com/MinimaxFlora/luci-app-adguardhome openwrt-adguardhome && mv -n openwrt-adguardhome/luci-app-adguardhome ./ ; rm -rf openwrt-adguardhome
 git clone --depth 1 https://github.com/sbwml/openwrt_pkgs && mv -n openwrt_pkgs/luci-app-socat ./ ; rm -rf openwrt_pkgs
 git clone --depth 1 https://github.com/sbwml/luci-app-diskman openwrt-diskman && mv -n openwrt-diskman/luci-app-diskman ./ ; rm -rf openwrt-diskman
 git clone --depth 1 https://github.com/sbwml/luci-app-mentohust openwrt-mentohust && mv -n openwrt-mentohust/{mentohust,luci-app-mentohust} ./ ; rm -rf openwrt-mentohust
