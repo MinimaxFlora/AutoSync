@@ -53,6 +53,8 @@ git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall-package
 mv openwrt-bandix-plus bandix-plus
 cp -f $GITHUB_WORKSPACE/images/bg1.jpg luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 sed -i "s/option online_wallpaper 'bing'/option online_wallpaper 'none'/g" luci-app-argon-config/root/etc/config/argon
+sed -i "s/option primary '#5e72e4'/option primary '#F4A7B9'/g" luci-app-argon-config/root/etc/config/argon
+sed -i "s/option mode 'normal'/option mode 'light'/g" luci-app-argon-config/root/etc/config/argon
 sed -i 's#include ../../luci.mk#include $(TOPDIR)/feeds/luci/luci.mk#g' luci-theme-design/Makefile
 sed -i 's#include ../../lang/golang/golang-package.mk#include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk#g' sing-box/Makefile
 
