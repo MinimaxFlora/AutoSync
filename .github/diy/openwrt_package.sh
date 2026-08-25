@@ -34,7 +34,7 @@ git clone --depth 1 https://github.com/sbwml/openwrt_pkgs && mv -n openwrt_pkgs/
 git clone --depth 1 https://github.com/sbwml/luci-app-diskman openwrt-diskman && mv -n openwrt-diskman/luci-app-diskman ./ ; rm -rf openwrt-diskman
 git clone --depth 1 https://github.com/sbwml/luci-app-mentohust openwrt-mentohust && mv -n openwrt-mentohust/{mentohust,luci-app-mentohust} ./ ; rm -rf openwrt-mentohust
 git clone --depth 1 -b main https://github.com/sbwml/luci-app-quickfile openwrt-quickfile && mv -n openwrt-quickfile/{quickfile,luci-app-quickfile} ./ ; rm -rf openwrt-quickfile
-git clone --depth 1 -b v5 https://github.com/sbwml/luci-app-mosdns openwrt-mosdns && mv -n openwrt-mosdns/{v2dat,mosdns,luci-app-mosdns} ./ ; rm -rf openwrt-mosdns
+git clone --depth 1 -b v5 https://github.com/sbwml/luci-app-mosdns openwrt-mosdns && mv -n openwrt-mosdns/{v2dat,mosdns,geo2txt,luci-app-mosdns} ./ ; rm -rf openwrt-mosdns
 git clone --depth 1 -b main https://github.com/sbwml/luci-app-airconnect openwrt-airconnect && mv -n openwrt-airconnect/{airconnect,luci-app-airconnect} ./ ; rm -rf openwrt-airconnect
 git clone --depth 1 -b main https://github.com/sbwml/luci-app-openlist2 openwrt-openlist2 && mv -n openwrt-openlist2/{openlist2,luci-app-openlist2} ./ ; rm -rf openwrt-openlist2
 git clone --depth 1 -b main https://github.com/timsaya/luci-app-bandix-plus openwrt-bandix && mv -n openwrt-bandix/luci-app-bandix-plus ./ ; rm -rf openwrt-bandix
