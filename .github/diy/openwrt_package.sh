@@ -42,8 +42,6 @@ git clone --depth 1 https://github.com/timsaya/openwrt-bandix-plus openwrt-bandi
 ### 科学插件 ###
 git clone --depth 1 -b master https://github.com/immortalwrt/homeproxy luci-app-homeproxy
 git clone --depth 1 -b master https://github.com/immortalwrt/packages && mv -n packages/net/sing-box ./ ; rm -rf packages
-git clone --depth 1 -b master https://github.com/immortalwrt/packages && mv -n packages/libs/libcronet ./ ; rm -rf packages
-git clone --depth 1 -b master https://github.com/immortalwrt/packages && mv -n packages/devel/gn ./ ; rm -rf packages
 git clone --depth 1 -b master https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./ ; rm -rf OpenClash
 git clone --depth 1 -b main https://github.com/nikkinikki-org/OpenWrt-nikki OpenWrt-nikki && mv -n OpenWrt-nikki/{mihomo-meta,nikki,luci-app-nikki} ./ ; rm -rf OpenWrt-nikki
 git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall && mv -n openwrt-passwall/luci-app-passwall ./ ; rm -rf openwrt-passwall
@@ -53,6 +51,7 @@ git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall-package
 ### 相关设置 ###
 mv openwrt-bandix-plus bandix-plus
 cp -f $GITHUB_WORKSPACE/images/bg1.webp luci-theme-argon/htdocs/luci-static/argon/img/bg1.webp
+sed -i 's/ +SING_BOX_BUILD_NAIVE_OUTBOUND:libcronet//' sing-box/Makefile
 sed -i "s/option primary '#5e72e4'/option primary '#F4A7B9'/g" luci-app-argon-config/root/etc/config/argon
 sed -i "s/option mode 'normal'/option mode 'light'/g" luci-app-argon-config/root/etc/config/argon
 sed -i 's#include ../../luci.mk#include $(TOPDIR)/feeds/luci/luci.mk#g' luci-theme-design/Makefile
