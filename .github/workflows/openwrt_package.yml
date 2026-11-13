@@ -35,13 +35,30 @@ jobs:
         chmod +x .github/diy/openwrt_package.sh
         git clone -b master https://github.com/MinimaxFlora/openwrt_package.git
         cd openwrt_package
-        # 保留 .git、.github、diy 目录，只清除包目录
-        find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.github' ! -name 'diy' -exec rm -rf {} +
+        # 保留仓库自带的工具/元数据，只清除包目录
+        #   .git/.github/diy   —— 同步脚本自己
+        #   tools/             —— 包列表 & 来源快照脚本（CI 依赖：list-packages.py / gen-lock.py / check-artifacts.py）
+        #   packages.lock.json —— 包来源快照，同步后由下一步重新生成
+        #   .gitignore
+        find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.github' ! -name 'diy' ! -name 'tools' ! -name '.gitignore' ! -name 'packages.lock.json' -exec rm -rf {} +
 
         $GITHUB_WORKSPACE/.github/diy/openwrt_package.sh
         bash /$GITHUB_WORKSPACE/.github/diy/convert_translation.sh
         bash /$GITHUB_WORKSPACE/.github/diy/create_acl_for_luci.sh -a
         bash /$GITHUB_WORKSPACE/.github/diy/Modify.sh
+
+    - name: Refresh packages.lock.json
+      run: |
+        cd $GITHUB_WORKSPACE/openwrt_package
+        # 同步后各包版本会变，lock 必须跟着刷新，否则 CI 的 gen-lock.py --check 会红
+        if [ -f tools/gen-lock.py ]; then
+          python3 tools/gen-lock.py
+        elif [ -d tools ]; then
+          echo "::error::tools/ 存在但缺 gen-lock.py"
+          exit 1
+        else
+          echo "::warning::tools/ 不在了（被同步清掉？），本仓库的 CI 会失败"
+        fi
 
     - name: Detect version-changed packages
       run: |
