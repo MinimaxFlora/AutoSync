@@ -42,6 +42,7 @@ git clone --depth 1 https://github.com/timsaya/openwrt-bandix-plus openwrt-bandi
 ### 科学插件 ###
 git clone --depth 1 -b master https://github.com/immortalwrt/homeproxy luci-app-homeproxy
 git clone --depth 1 -b master https://github.com/immortalwrt/packages && mv -n packages/net/sing-box ./ ; rm -rf packages
+git clone --depth 1 -b master https://github.com/immortalwrt/packages && mv -n packages/libs/libcronet ./ ; rm -rf packages
 git clone --depth 1 -b master https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./ ; rm -rf OpenClash
 git clone --depth 1 -b main https://github.com/nikkinikki-org/OpenWrt-nikki OpenWrt-nikki && mv -n OpenWrt-nikki/{mihomo-meta,nikki,luci-app-nikki} ./ ; rm -rf OpenWrt-nikki
 git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall && mv -n openwrt-passwall/luci-app-passwall ./ ; rm -rf openwrt-passwall
