@@ -40,8 +40,7 @@ git clone --depth 1 -b main https://github.com/timsaya/luci-app-bandix-plus open
 git clone --depth 1 https://github.com/timsaya/openwrt-bandix-plus openwrt-bandix && mv -n openwrt-bandix/openwrt-bandix-plus ./ ; rm -rf openwrt-bandix
 
 ### 科学插件 ###
-git clone --depth 1 -b master https://github.com/immortalwrt/homeproxy luci-app-homeproxy
-git clone --depth 1 -b master https://github.com/immortalwrt/packages && mv -n packages/net/sing-box ./ ; rm -rf packages
+git clone --depth 1 -b main https://github.com/VIKINGYFY/packages VIKINGYFY-packages && mv -n VIKINGYFY-packages/{luci-app-homeproxy,sing-box} ./ ; rm -rf VIKINGYFY-packages
 git clone --depth 1 -b master https://github.com/vernesong/OpenClash && mv -n OpenClash/luci-app-openclash ./ ; rm -rf OpenClash
 git clone --depth 1 -b main https://github.com/nikkinikki-org/OpenWrt-nikki OpenWrt-nikki && mv -n OpenWrt-nikki/{mihomo-meta,nikki,luci-app-nikki} ./ ; rm -rf OpenWrt-nikki
 git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall && mv -n openwrt-passwall/luci-app-passwall ./ ; rm -rf openwrt-passwall
@@ -51,14 +50,6 @@ git clone --depth 1 https://github.com/Openwrt-Passwall/openwrt-passwall-package
 ### 相关设置 ###
 mv openwrt-bandix-plus bandix-plus
 cp -f $GITHUB_WORKSPACE/images/bg1.webp luci-theme-argon/htdocs/luci-static/argon/img/bg1.webp
-sed -i 's|DEPENDS+= +kmod-netlink-diag +kmod-tun +SING_BOX_BUILD_NAIVE_OUTBOUND:libcronet|DEPENDS+= +kmod-netlink-diag +kmod-tun|' sing-box/Makefile
-# sing-box 的 naive_outbound 默认是 def_bool y → full 变体会加 with_naive_outbound 并链接 -lcronet，
-# 而 libcronet（Chromium cronet）不在本 feed 里，编译最后会 "cannot find -lcronet"。
-# 改成默认不启用；谁真要用 naive，自己把 libcronet 一起加进来再在 menuconfig 里打开。
-sed -i 's|^  def_bool y$|  bool "Build with Naive outbound support (needs libcronet)"|' sing-box/Makefile
-# tiny 变体也引用了 libcronet，去掉这句，免得每次 defconfig 都刷
-# "has a dependency on 'libcronet', which does not exist"
-sed -i 's|^  DEPENDS+= +SING_BOX_TINY_BUILD_NAIVE_OUTBOUND:libcronet$||' sing-box/Makefile
 sed -i "s/option primary '#5e72e4'/option primary '#F4A7B9'/g" luci-theme-argon/root/etc/config/argon
 sed -i "s/option mode 'normal'/option mode 'light'/g" luci-theme-argon/root/etc/config/argon
 sed -i 's#include ../../luci.mk#include $(TOPDIR)/feeds/luci/luci.mk#g' luci-theme-design/Makefile
