@@ -55,9 +55,23 @@ sed -i "s/option mode 'normal'/option mode 'light'/g" luci-theme-argon/root/etc/
 sed -i 's#include ../../luci.mk#include $(TOPDIR)/feeds/luci/luci.mk#g' luci-theme-design/Makefile
 sed -i 's#include ../../lang/golang/golang-package.mk#include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk#g' sing-box/Makefile
 
-### openclash 单独编译缺 po2lmo（它没 include luci.mk，带不出 luci-base/host 依赖）###
-sed -i '/^include \$(INCLUDE_DIR)\/package\.mk$/a PKG_BUILD_DEPENDS:+=luci-base/host' luci-app-openclash/Makefile 2>/dev/null || true
-sed -i 's#DEPENDS:=+dnsmasq-full#DEPENDS:=+luci-base +dnsmasq-full#g' luci-app-openclash/Makefile 2>/dev/null || true
+### openclash 中文翻译：SDK 里没有 po2lmo（luci 主机工具），同步时预生成 .lmo ###
+if [ -d luci-app-openclash/po ]; then
+  _luci=$(mktemp -d)
+  git clone -q --depth 1 --filter=blob:none --sparse https://github.com/openwrt/luci "$_luci" 2>/dev/null || true
+  ( cd "$_luci" && git sparse-checkout set modules/luci-base/src ) >/dev/null 2>&1 || true
+  if make -s -C "$_luci/modules/luci-base/src" po2lmo >/dev/null 2>&1; then
+    mkdir -p luci-app-openclash/lmo
+    find luci-app-openclash/po -name '*.po' | while read -r _po; do
+      "$_luci/modules/luci-base/src/po2lmo" "$_po" "luci-app-openclash/lmo/$(basename "${_po%.po}").lmo" || true
+    done
+    sed -i 's#po2lmo $(po) $(PKG_BUILD_DIR)/$(patsubst %.po,%.lmo,$(notdir $(po)));)#$(CP) $(CURDIR)/lmo/$(patsubst %.po,%.lmo,$(notdir $(po))) $(PKG_BUILD_DIR)/;#' luci-app-openclash/Makefile
+    echo "openclash lmo 预生成: $(find luci-app-openclash/lmo -name '*.lmo' | wc -l) 个"
+  else
+    echo "::warning::po2lmo 编译失败，openclash 将不带中文翻译"
+  fi
+  rm -rf "$_luci"
+fi
 
 ### 提前保存各包的上游最新 commit 信息（在删除 .git 之前）###
 echo "保存上游 commit 信息..."
