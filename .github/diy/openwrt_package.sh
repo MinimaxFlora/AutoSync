@@ -55,6 +55,10 @@ sed -i "s/option mode 'normal'/option mode 'light'/g" luci-theme-argon/root/etc/
 sed -i 's#include ../../luci.mk#include $(TOPDIR)/feeds/luci/luci.mk#g' luci-theme-design/Makefile
 sed -i 's#include ../../lang/golang/golang-package.mk#include $(TOPDIR)/feeds/packages/lang/golang/golang-package.mk#g' sing-box/Makefile
 
+### openclash 单独编译缺 po2lmo（它没 include luci.mk，带不出 luci-base/host 依赖）###
+sed -i '/^include \$(INCLUDE_DIR)\/package\.mk$/a PKG_BUILD_DEPENDS:+=luci-base/host' luci-app-openclash/Makefile 2>/dev/null || true
+sed -i 's#DEPENDS:=+dnsmasq-full#DEPENDS:=+luci-base +dnsmasq-full#g' luci-app-openclash/Makefile 2>/dev/null || true
+
 ### 提前保存各包的上游最新 commit 信息（在删除 .git 之前）###
 echo "保存上游 commit 信息..."
 : > /tmp/upstream_commit_msgs.txt
