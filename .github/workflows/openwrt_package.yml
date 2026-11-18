@@ -3,6 +3,9 @@ name: openwrt_package
 on:
   repository_dispatch:
   workflow_dispatch:
+  schedule:
+    # 每天北京时间 00:00 自动触发（UTC 16:00）
+    - cron: '0 16 * * *'
 
 env:
   TZ: Asia/Shanghai
