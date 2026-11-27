@@ -182,7 +182,7 @@ jobs:
         fi
 
         if [ "$committed_any" = "true" ]; then
-          git push --force --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/MinimaxFlora/openwrt_package.git" HEAD:master
+          git push --force --quiet "https://${{ secrets.ACCESS_TOKEN }}@github.com/MinimaxFlora/openwrt_helloworld.git" HEAD:master
           echo "✅ Push 完成"
         else
           echo "ℹ️ nothing to push"
