@@ -15,7 +15,7 @@ mv -n `find $1/* -maxdepth 0 -type d` ./
 rm -rf $1
 }
 
-# wall 里除 sing-box 外全部保留；sing-box 改由下方 VIKINGYFY 与 luci-app-homeproxy 成对提供
+# 科学插件
 git clone --depth 1 https://github.com/kenzok8/wall && rm -rf wall/sing-box && mv -n wall/* ./ ; rm -rf {UnblockNeteaseMusic,adguardhome,alist,ddns-go,docker,dockerd,filebrowser,gost,lucky,mosdns,sagernet-core,smartdns,ucl,upx-static,upx} && rm -rf wall
 git clone --depth 1 https://github.com/kenzok8/openwrt-daede openwrt-daede && cp -rf openwrt-daede/{dae,daed,luci-app-daede} ./; rm -rf openwrt-daede
 git clone --depth 1 -b v5 https://github.com/sbwml/luci-app-mosdns openwrt-mos && mv -n openwrt-mos/{luci-app-mosdns,mosdns,geo2txt} ./ && rm -rf openwrt-mos
@@ -27,10 +27,7 @@ git clone --depth 1 https://github.com/nikkinikki-org/OpenWrt-momo OpenWrt-momo 
 git clone --depth 1 https://github.com/nikkinikki-org/OpenWrt-nikki OpenWrt-nikki && mv -n OpenWrt-nikki/*nikki ./ ; rm -rf OpenWrt-nikki
 git clone --depth 1 https://github.com/kenzok8/openwrt-clashoo openwrt-clashoo && mv -n openwrt-clashoo/*clashoo ./; rm -rf openwrt-clashoo
 git clone --depth 1 https://github.com/muink/openwrt-fchomo openwrt-fchomo && mv -n openwrt-fchomo/*homo ./ ; rm -rf openwrt-fchomo
-#git clone --depth 1 https://github.com/QiuSimons/luci-app-honk wrt-honk && mv -n wrt-honk/*honk ./ ; rm -rf wrt-honk
 git clone --depth 1 https://github.com/kenzok8/openwrt-honk openwrt-honk && mv -n openwrt-honk/*honk ./; rm -rf openwrt-honk
-# luci-app-homeproxy 与 sing-box 必须成对取自同一上游：新版 luci 运行时会硬校验 sing-box >= 1.15，
-# 且依赖其 1.15 配置项与 DNS TCP 补丁，配置 wall 的 1.14.x 会导致插件无法启动
 git_sparse_clone main https://github.com/VIKINGYFY/packages vk-packages luci-app-homeproxy sing-box
 
 sed -i \
